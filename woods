@@ -1,0 +1,84 @@
+def calculate_tip_pool_for_night(total_tips, bartenders_hours, barbacks_hours, food_runner_hours, support_percentage):
+   total_bartender_hours = sum(bartenders_hours)  # Total hours worked by all bartenders combined
+   total_barback_hours = sum(barbacks_hours)  # Total hours worked by all barbacks combined
+   total_support_hours = total_barback_hours + food_runner_hours  # Total hours worked by barbacks + food runner
+
+   bartender_shares = []
+   barback_shares = []
+
+   # Step 1: Split the tips
+   support_total = total_tips * (support_percentage / 100)  # 30% (or user-defined) for support staff
+   bartenders_total = total_tips - support_total  # Remaining tips go to bartenders
+
+   # Step 2: Calculate individual shares for support staff (barbacks + food runner)
+   if total_support_hours > 0:
+       # Distribute support tips between barbacks and food runner based on hours worked
+       barback_share = support_total * (total_barback_hours / total_support_hours)
+       food_runner_share = support_total * (food_runner_hours / total_support_hours)
+   else:
+       barback_share = 0
+       food_runner_share = 0
+
+   # Step 3: Calculate individual shares for each bartender
+   if total_bartender_hours > 0:
+       for i in range(len(bartenders_hours)):
+           bartender_share_i = bartenders_total * (bartenders_hours[i] / total_bartender_hours)
+           bartender_shares.append(bartender_share_i)
+   else:
+       bartender_shares = [0] * len(bartenders_hours)
+
+   # Step 4: Calculate individual shares for each barback
+   if total_barback_hours > 0:
+       for i in range(len(barbacks_hours)):
+           barback_share_i = barback_share * (barbacks_hours[i] / total_barback_hours)
+           barback_shares.append(barback_share_i)
+   else:
+       barback_shares = [0] * len(barbacks_hours)
+
+   return bartender_shares, barback_shares, food_runner_share
+
+# Example Usage
+# Input total tips for the night
+total_tips = float(input("Enter the total tips for the night: $"))
+
+# Input hours worked for each bartender
+num_bartenders = int(input("Enter the number of bartenders: "))
+bartenders_hours = []
+for i in range(num_bartenders):
+   hours = float(input(f"Enter the hours worked by bartender {i+1}: "))
+   bartenders_hours.append(hours)
+
+# Input the number of barbacks
+num_barbacks = int(input("Enter the number of barbacks: "))
+barbacks_hours = []
+for i in range(num_barbacks):
+   hours = float(input(f"Enter the hours worked by barback {i+1}: "))
+   barbacks_hours.append(hours)
+
+# Input hours worked by the food runner
+food_runner_hours = float(input("Enter the hours worked by the food runner: "))
+
+# Input the support percentage (barbacks and food runner)
+while True:
+   support_percentage = float(input("Enter the tip percentage for the support staff (between 25% and 30%): "))
+   if 25 <= support_percentage <= 30:
+       break
+   else:
+       print("Invalid input. Please enter a percentage between 25% and 30%.")
+
+# Calculate the tip pool distribution
+bartender_tips, barback_tips, foodrunner_tips = calculate_tip_pool_for_night(total_tips, bartenders_hours, barbacks_hours, food_runner_hours, support_percentage)
+
+# Display the results
+print("\nTip Distribution Summary:")
+
+# Display bartender tips
+for i, tip in enumerate(bartender_tips):
+   print(f"Bartender {i+1} gets: ${tip:.2f}")
+
+# Display barback tips
+for i, tip in enumerate(barback_tips):
+   print(f"Barback {i+1} gets: ${tip:.2f}")
+
+# Display food runner tip
+print(f"Food Runner gets: ${foodrunner_tips:.2f}")
